@@ -100,8 +100,6 @@ While developing this project, I deepened my understanding of:
 - [Express.js](https://expressjs.com/)
 - [MongoDB Docs](https://www.mongodb.com/docs/)
 
-## 🤝 Acknowledgments
+## 🤝 Acknowledgment
 
-This project reflects my ongoing journey in building robust and modern web applications. Thanks to the open-source community and tool creators whose work made this possible.
-
-Feel free to fork this project, contribute, or reach out with feedback!
+DevOps Engineer practicing real-world deployment, containerization, and CI/CD workflows, where I have practiced deploying and managing a MERN-based production application using Docker, Nginx, PM2, and cloud infrastructure
