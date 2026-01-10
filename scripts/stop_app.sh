@@ -1,9 +1,7 @@
 #!/bin/bash
+#!/bin/bash
 set -e
 
-echo "Starting Docker containers..."
-
-cd /var/www/shift-manager
-docker compose build
-docker compose up -d
+cd /var/www/Shift-Manager || exit 0
+docker compose down || true
 
