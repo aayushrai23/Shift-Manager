@@ -1,12 +1,14 @@
 #!/bin/bash
 set -e
 
-echo "Fetching secrets from AWS Secrets Manager..."
+APP_DIR="/var/www/Shift-Manager"
+BACKEND_ENV="$APP_DIR/backend/.env"
+MONGO_ENV="$APP_DIR/mongo.env"
 
 SECRET_NAME="shift-manager-env"
 REGION="ap-south-1"
 
-BACKEND_ENV_PATH="/var/www/shift-manager/backend/.env"
+echo "Fetching backend secrets from AWS Secrets Manager..."
 
 SECRET_JSON=$(aws secretsmanager get-secret-value \
   --secret-id "$SECRET_NAME" \
@@ -14,16 +16,20 @@ SECRET_JSON=$(aws secretsmanager get-secret-value \
   --query SecretString \
   --output text)
 
-echo "Writing backend .env file..."
-
-mkdir -p /var/www/shift-manager/backend
+# Backend .env
+mkdir -p "$APP_DIR/backend"
 
 echo "$SECRET_JSON" | jq -r '
   to_entries | .[] | "\(.key)=\(.value)"
-' > "$BACKEND_ENV_PATH"
+' > "$BACKEND_ENV"
 
-chown ubuntu:ubuntu "$BACKEND_ENV_PATH"
-chmod 600 "$BACKEND_ENV_PATH"
+# Mongo env (local, non-secret)
+cat <<EOF > "$MONGO_ENV"
+MONGO_INITDB_ROOT_USERNAME=admin
+MONGO_INITDB_ROOT_PASSWORD=admin123
+EOF
 
-echo "Backend .env created successfully"
+chown -R ubuntu:ubuntu "$APP_DIR"
+chmod 600 "$BACKEND_ENV" "$MONGO_ENV"
 
+echo "Environment files created successfully"
