@@ -3,12 +3,9 @@ version: 0.2
 phases:
   build:
     commands:
-<<<<<<< HEAD
-      - echo "🚀 Docker app – packaging source for CodeDeploy"
-=======
-      - echo "Docker-based app – no build step in CodeBuild"
->>>>>>> a6fdf66 (changes in hooks)
+      - echo "Packaging Docker application for CodeDeploy"
 
 artifacts:
   files:
     - '**/*'
+

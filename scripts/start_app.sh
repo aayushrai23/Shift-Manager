@@ -7,3 +7,4 @@ cd /var/www/shift-manager
 
 docker compose build
 docker compose up -d
+
