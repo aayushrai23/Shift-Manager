@@ -1,0 +1,63 @@
+name: Build & Deploy Shift-Manager
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2️⃣ Setup SSH agent with private key
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+
+      # 3️⃣ Prepare SSH (avoid host key issues)
+      - name: Prepare SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "Host *" >> ~/.ssh/config
+          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+          echo "  UserKnownHostsFile=/dev/null" >> ~/.ssh/config
+          chmod 600 ~/.ssh/config
+
+      # 4️⃣ Build & Deploy on server
+      - name: Build and Deploy
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+            set -e
+
+            cd /var/www/Shift-Manager
+
+            echo "Pulling latest code"
+            git pull origin main
+
+            echo "Creating backend env"
+            cat <<EOT > backend/.env
+            PORT=5000
+            NODE_ENV=production
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            MONGO_URI=mongodb://mongo:27017/shiftmanager
+            EOT
+
+            echo "Creating mongo env"
+            cat <<EOT > mongo.env
+            MONGO_INITDB_DATABASE=shiftmanager
+            EOT
+
+            echo "Building and restarting containers"
+            docker compose down
+            docker compose up -d --build
+
+            echo "✅ Build & Deploy completed successfully"
+          EOF
