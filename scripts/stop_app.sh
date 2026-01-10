@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
-echo "Stopping existing PM2 app if running..."
+echo "Starting Docker containers..."
 
-pm2 stop shift-manager || echo "App not running"
+cd /var/www/shift-manager
+docker compose build
+docker compose up -d
+
