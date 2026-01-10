@@ -5,7 +5,8 @@ echo "Fetching secrets from AWS Secrets Manager..."
 
 SECRET_NAME="shift-manager-env"
 REGION="ap-south-1"
-ENV_PATH="/var/www/shift-manager/.env"
+
+BACKEND_ENV_PATH="/var/www/shift-manager/backend/.env"
 
 SECRET_JSON=$(aws secretsmanager get-secret-value \
   --secret-id "$SECRET_NAME" \
@@ -13,11 +14,16 @@ SECRET_JSON=$(aws secretsmanager get-secret-value \
   --query SecretString \
   --output text)
 
+echo "Writing backend .env file..."
+
+mkdir -p /var/www/shift-manager/backend
+
 echo "$SECRET_JSON" | jq -r '
   to_entries | .[] | "\(.key)=\(.value)"
-' > "$ENV_PATH"
+' > "$BACKEND_ENV_PATH"
 
-chown ubuntu:ubuntu "$ENV_PATH"
-chmod 600 "$ENV_PATH"
+chown ubuntu:ubuntu "$BACKEND_ENV_PATH"
+chmod 600 "$BACKEND_ENV_PATH"
 
-echo ".env file created"
+echo "Backend .env created successfully"
+
