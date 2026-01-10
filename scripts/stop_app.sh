@@ -1,7 +1,11 @@
 #!/bin/bash
-#!/bin/bash
 set -e
 
-cd /var/www/Shift-Manager || exit 0
-docker compose down || true
+echo "Stopping Docker containers..."
+
+APP_DIR="/var/www/Shift-Manager"
+
+cd "$APP_DIR" || exit 0
+
+docker compose down || docker-compose down || true
 
